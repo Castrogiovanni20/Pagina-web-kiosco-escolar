@@ -1,0 +1,222 @@
+<html>
+
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js">
+    </script>
+
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+
+</head>
+
+<body style="background: #fcfcfc">
+    <div id="app">
+
+        <div class="jumbotron">
+            <h1 class="display-4">Kiosc<strong>ORT</strong></h1>
+            <p class="lead">Realice su pedido debajo. Aceptamos tarjetas Visa y Mastercard. Envios a domicilio. Gracias
+                por confiar en nosotros.</p>
+        </div>
+
+
+
+
+        <br>
+
+        <div class="container" style="padding: 0">
+            <div class="row">
+                <div class="col-md-3">
+
+                    <form id="formulario">
+
+                        <div class=" form-group">
+                            <label>Producto</label>
+                            <input type="text" class="form-control" v-model="producto"
+                                placeholder="Ingrese el nombre producto" required>
+                            <small id="emailHelp" class="form-text text-muted">Prohibida la venta de bebidas alcoholicas
+                                a menores de 18 años.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cantidad</label>
+                            <input type="number" class="form-control" v-model="cantidad" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Precio unitario</label>
+                            <input type="text" class="form-control" v-model="precio" placeholder="$" required>
+                        </div>
+
+                        <button type="button" class="btn btn-primary" v-on:click="addProd()">Agregar</button>
+                    </form>
+
+                </div>
+
+                <div class="col-md-9">
+                    <br>
+                    <div class="table-hover">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Subtotal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr v-for="elemento in carrito">
+                                    <td>
+                                        <div class="elemento" v-show="elemento.editar == false">
+                                            {{ elemento.producto }}
+                                        </div class="elemento">
+
+                                        <input type="text" v-bind:value="elemento.producto" v-if="elemento.editar"
+                                            class="form-control">
+                                    </td>
+                                    <td>
+                                        <div class="elemento" v-show="elemento.editar == false">
+                                            <button type="button" class="btn btn-info btn-sm"
+                                                v-on:click="aumentarCantidad(elemento)">+ Add </button>
+                                            {{ elemento.cantidad }}
+                                        </div>
+                                        <input type="text" v-bind:value="elemento.cantidad" v-if="elemento.editar"
+                                            class="form-control">
+                                    </td>
+                                    <td>
+                                        <div class="elemento" v-show="elemento.editar == false">
+                                            ${{ elemento.precio }}
+                                        </div>
+                                        <input tpye="text" v-bind:value="elemento.precio" v-if="elemento.editar"
+                                            class="form-control">
+                                    </td>
+                                    <td>
+                                        ${{ elemento.subtotal }}
+
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary"
+                                            v-on:click="actualizarProd(elemento)"
+                                            v-if="elemento.editar">Actualizar</button>
+                                        <button type="button" href="#" class="btn btn-success"
+                                            v-on:click="editarProd(elemento)" v-if="elemento.editar == false">Editar
+                                        </button>
+                                        <button type="button" class="btn btn-danger"
+                                            v-on:click="eliminarProd(elemento)">Eliminar</button>
+
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h3 style="color:black">Total: ${{ calcularTotal }}</h3>
+
+                        <br><br><br>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <footer class="page-footer font-small blue" style="position: fixed; bottom: 0px; height: 40px; width: 100%;">
+
+            <!-- Copyright -->
+            <div class="footer-copyright text-center py-3">© 2019 Instituto de Tecnologia ORT -
+                <a href="mailto:ramirocastrogiovanni@gmail.com"> Powered by <strong>Ramiro Castrogiovanni</strong></a>
+            </div>
+            <!-- Copyright -->
+
+        </footer>
+    </div>
+
+
+    <script>
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                carrito: [
+
+                    { id: 0, producto: "Bizcochitos Don Satur", cantidad: 1, precio: 60, subtotal: 120, editar: false },
+                    { id: 1, producto: "Cafe cortado", cantidad: 3, precio: 85, subtotal: 255, editar: false },
+                    { id: 2, producto: "Empanada 3 quesos", cantidad: 2, precio: 70, subtotal: 140, editar: false },
+                ],
+                total: 0
+            },
+            methods: {
+                addProd: function () {
+
+                    var datos = {
+
+                        id: this.id,
+                        producto: this.producto,
+                        cantidad: this.cantidad,
+                        precio: this.precio,
+                        editar: false,
+                        subtotal: this.calcularSubtotal(),
+
+                    }
+
+                    this.carrito.push(datos);
+
+                    this.producto = " ";
+                    this.precio = " ";
+                    this.cantidad = " ;"
+                },
+
+                eliminarProd: function (producto) {
+
+                    var index = this.carrito.indexOf(producto)
+                    this.carrito.splice(index, 1)
+
+                },
+
+                calcularSubtotal: function () {
+                    return this.precio * this.cantidad;
+                },
+
+                aumentarCantidad: function (producto) {
+                    producto.cantidad++;
+                    producto.subtotal = producto.precio * producto.cantidad
+
+                },
+
+                editarProd: function (producto) {
+                    producto.editar = true;
+                },
+
+                actualizarProd: function (producto) {
+                    producto.editar = false;
+
+                    var index = this.carrito.indexOf(producto);
+                    alert(producto.precio)
+                    this.carrito[index].precio = elemento.precio
+
+
+                }
+            },
+            computed: {
+                calcularTotal: function () {
+                    let total = 0;
+                    this.carrito.forEach(element => {
+                        total = total + element.subtotal;
+                    });
+                    return total;
+                }
+            }
+
+        });
+        windows.vue = app;
+
+    </script>
+
+    <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+
+</body>
+
+
+</html>
